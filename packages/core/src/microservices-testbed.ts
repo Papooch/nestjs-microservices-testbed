@@ -1,4 +1,4 @@
-import { ReadPacket } from '@nestjs/microservices';
+import { ClientProviderOptions, ReadPacket } from '@nestjs/microservices';
 import { TestBedClient } from './testbed-client';
 import { TestBedServer } from './testbed-server';
 import { TransportId } from './types';
@@ -30,6 +30,15 @@ export class MicroservicesTestBed {
             constructor() {
                 return testBed.getClientInstance();
             }
+        };
+    }
+
+    getClientProviderOptions(
+        injectionToken: string | symbol,
+    ): ClientProviderOptions {
+        return {
+            name: injectionToken,
+            customClass: this.getClientClass(),
         };
     }
 

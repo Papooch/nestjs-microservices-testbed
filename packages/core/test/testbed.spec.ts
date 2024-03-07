@@ -20,6 +20,7 @@ import {
 import { Test } from '@nestjs/testing';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { MicroservicesTestBed } from '../src';
+import { TestBedClient } from '../src/testbed-client';
 
 const testBed = new MicroservicesTestBed();
 
@@ -62,15 +63,15 @@ class TestAppConsumer {
     }
 }
 
+const clientsModule = ClientsModule.register([
+    {
+        name: 'TEST_SERVICE',
+        customClass: TestBedClient,
+    },
+]);
+
 @Module({
-    imports: [
-        ClientsModule.register([
-            {
-                name: 'TEST_SERVICE',
-                customClass: testBed.getClientClass(),
-            },
-        ]),
-    ],
+    imports: [clientsModule],
     controllers: [TestAppConsumer],
 })
 class TestAppModule {}
@@ -82,7 +83,16 @@ describe('Microservices Testbed', () => {
         const module = await Test.createTestingModule({
             imports: [TestAppModule],
         })
-
+            .overrideModule(clientsModule)
+            .useModule({
+                module: class TestModule {},
+                imports: [
+                    ClientsModule.register([
+                        testBed.getClientProviderOptions('TEST_SERVICE'),
+                    ]),
+                ],
+                exports: [ClientsModule],
+            })
             .compile();
         app = module.createNestMicroservice<MicroserviceOptions>({
             strategy: testBed.getServerInstance(),
