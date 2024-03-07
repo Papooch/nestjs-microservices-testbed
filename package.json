@@ -1,0 +1,42 @@
+{
+    "name": "nestjs-microservices-testbed",
+    "version": "0.0.0",
+    "main": "index.js",
+    "description": "A collection of utilities for testing microservices integration in NestJS.",
+    "author": "papooch",
+    "license": "MIT",
+    "homepage": "https://github.com/Papooch/nestjs-microservices-testbed",
+    "keywords": [
+        "nest",
+        "nestjs",
+        "testing",
+        "test",
+        "e2e",
+        "integration",
+        "microservices"
+    ],
+    "workspaces": [
+        "packages/*"
+    ],
+    "packageManager": "yarn@4.1.1",
+    "scripts": {
+        "test": "yarn workspaces foreach --all --topological-dev run test",
+        "build": "yarn workspaces foreach --all --topological-dev run build",
+        "format": "prettier --write \"packages/**/*.ts\"",
+        "lint": "eslint \"packages/**/*.ts\"",
+        "lint:fix": "eslint \"packages/**/*.ts\" --fix"
+    },
+    "devDependencies": {
+        "@goldstack/utils-typescript-references": "^0.3.9",
+        "@monodeploy/plugin-github": "^2.0.1",
+        "@tophat/conventional-changelog-config": "^1.0.1",
+        "@typescript-eslint/eslint-plugin": "^7.1.1",
+        "@typescript-eslint/parser": "^7.1.1",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.1.3",
+        "monodeploy": "^5.0.1",
+        "prettier": "^3.2.5",
+        "typescript": "~5.4.2"
+    }
+}
