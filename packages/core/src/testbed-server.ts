@@ -1,7 +1,7 @@
 import { TransportId } from './types';
 
 import { CustomTransportStrategy, Server } from '@nestjs/microservices';
-import { firstValueFrom, isObservable } from 'rxjs';
+import { isObservable, lastValueFrom } from 'rxjs';
 
 export class TestBedServer extends Server implements CustomTransportStrategy {
     transportId?: TransportId;
@@ -16,7 +16,10 @@ export class TestBedServer extends Server implements CustomTransportStrategy {
     }
     close() {}
 
-    public async emitMessage(pattern: string, data: any): Promise<any> {
+    public async handleEventOrMessage(
+        pattern: string,
+        data: any,
+    ): Promise<any> {
         const handler = this.getHandlerByPattern(pattern);
         if (!handler) {
             return this.logger.error(`No handler for pattern ${pattern}`);
@@ -24,7 +27,7 @@ export class TestBedServer extends Server implements CustomTransportStrategy {
         const resultOrStream = await handler(data, {});
         let result: any;
         if (isObservable(resultOrStream)) {
-            result = firstValueFrom(resultOrStream);
+            result = lastValueFrom(resultOrStream);
         } else {
             result = resultOrStream;
         }

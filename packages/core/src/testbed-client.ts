@@ -31,6 +31,7 @@ export class TestBedClient extends ClientProxy {
         this.messageHandler(packet).then((result) => {
             callback({
                 response: result,
+                isDisposed: true,
             });
         });
         return () => {};

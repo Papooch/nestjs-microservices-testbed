@@ -37,6 +37,7 @@
         "eslint-plugin-prettier": "^5.1.3",
         "monodeploy": "^5.0.1",
         "prettier": "^3.2.5",
-        "typescript": "~5.4.2"
+        "typescript": "~5.4.2",
+        "wait-for-expect": "^3.0.2"
     }
 }

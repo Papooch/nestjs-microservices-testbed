@@ -1,4 +1,4 @@
-import { ClientProviderOptions, ReadPacket } from '@nestjs/microservices';
+import { ReadPacket } from '@nestjs/microservices';
 import { TestBedClient } from './testbed-client';
 import { TestBedServer } from './testbed-server';
 import { TransportId } from './types';
@@ -7,6 +7,8 @@ export class MicroservicesTestBed {
     transportId?: TransportId;
     private readonly server: TestBedServer;
     private readonly client: TestBedClient;
+
+    private messagesByPattern = new Map<string, any[]>();
 
     constructor(options: { transportId?: TransportId } = {}) {
         this.transportId = options.transportId;
@@ -33,16 +35,24 @@ export class MicroservicesTestBed {
         };
     }
 
-    getClientProviderOptions(
-        injectionToken: string | symbol,
-    ): ClientProviderOptions {
-        return {
-            name: injectionToken,
-            customClass: this.getClientClass(),
-        };
+    handleMessage<T>(message: ReadPacket<T>) {
+        const messages = this.messagesByPattern.get(message.pattern) ?? [];
+        messages.push(message);
+        this.messagesByPattern.set(message.pattern, messages);
+        return this.server.handleEventOrMessage(message.pattern, message.data);
     }
 
-    handleMessage<T>(message: ReadPacket<T>) {
-        return this.server.emitMessage(message.pattern, message.data);
+    getRecentMessagesForPattern<T = any>(
+        pattern: string,
+        recentMessagesCount = 1,
+    ): T[] {
+        const messages = this.messagesByPattern.get(pattern);
+        const slice = messages?.slice(-recentMessagesCount) ?? [];
+        return slice;
+    }
+
+    getLastMessageForPattern(pattern: string) {
+        const message = this.getRecentMessagesForPattern(pattern, 1).at(0);
+        return message;
     }
 }
