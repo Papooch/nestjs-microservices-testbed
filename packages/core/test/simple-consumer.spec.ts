@@ -93,7 +93,7 @@ describe('Microservices Testbed', () => {
             strategy: testBed.getServerInstance(),
         });
         assertionHelper = app.get(AssertionHelper);
-        await app.init();
+        await app.listen();
     });
 
     afterAll(async () => {
@@ -101,7 +101,7 @@ describe('Microservices Testbed', () => {
     });
 
     it('handles plain event pattern', async () => {
-        await testBed.handleMessage({
+        testBed.handleEvent({
             pattern: 'plain-event',
             data: 'something',
         });
@@ -121,14 +121,14 @@ describe('Microservices Testbed', () => {
     });
 
     it('handles event pattern interceptor', async () => {
-        await testBed.handleMessage({
+        testBed.handleEvent({
             pattern: 'event-with-interceptor',
             data: 'intercepted-event',
         });
-        expect(assertionHelper.interceptedEvents.at(-1)).toBe(
-            'intercepted:intercepted-event',
-        );
         await waitForExpect(() => {
+            expect(assertionHelper.interceptedEvents.at(-1)).toBe(
+                'intercepted:intercepted-event',
+            );
             expect(assertionHelper.handledEvents.at(-1)).toBe(
                 'handled:intercepted-event',
             );

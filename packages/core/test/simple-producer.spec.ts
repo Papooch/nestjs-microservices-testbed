@@ -102,7 +102,7 @@ describe('Microservices Testbed', () => {
             strategy: testBed.getServerInstance(),
         });
         producer = app.get(TestAppProducer);
-        await app.init();
+        await app.listen();
     });
 
     afterAll(async () => {

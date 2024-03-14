@@ -6,6 +6,7 @@ export class TestBedClient extends ClientProxy {
         private readonly messageHandler: (
             packet: ReadPacket<any>,
         ) => Promise<any>,
+        private readonly eventHandler: (packet: ReadPacket<any>) => void,
     ) {
         super();
     }
@@ -36,9 +37,7 @@ export class TestBedClient extends ClientProxy {
         });
         return () => {};
     }
-    protected async dispatchEvent<T = any>(
-        packet: ReadPacket<any>,
-    ): Promise<T> {
-        return await this.messageHandler(packet);
+    protected async dispatchEvent(packet: ReadPacket<any>): Promise<any> {
+        this.eventHandler(packet);
     }
 }
