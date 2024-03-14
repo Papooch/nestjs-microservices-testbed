@@ -1,14 +1,21 @@
 import { ClientProxy, ReadPacket, WritePacket } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 
+type MessageHandler = (packet: ReadPacket<any>) => Promise<any>;
+type EventHandler = (packet: ReadPacket<any>) => void;
+
+export interface TestBedClientOptions {
+    messageHandler: MessageHandler;
+    eventHandler: EventHandler;
+}
 export class TestBedClient extends ClientProxy {
-    constructor(
-        private readonly messageHandler: (
-            packet: ReadPacket<any>,
-        ) => Promise<any>,
-        private readonly eventHandler: (packet: ReadPacket<any>) => void,
-    ) {
+    messageHandler: MessageHandler;
+    eventHandler: EventHandler;
+
+    constructor(options: TestBedClientOptions) {
         super();
+        this.messageHandler = options.messageHandler;
+        this.eventHandler = options.eventHandler;
     }
 
     connect(): Promise<any> {

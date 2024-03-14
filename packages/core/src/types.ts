@@ -2,8 +2,8 @@ import { Transport } from '@nestjs/microservices';
 
 export type TransportId = symbol | Transport | undefined;
 
-export type TestBedMessage = {
+export type TestBedMessage<T = any> = {
     pattern: string;
     routingKey?: string;
-    data: any;
+    data: T;
 };
