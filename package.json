@@ -1,6 +1,7 @@
 {
     "name": "nestjs-microservices-testbed",
     "version": "0.0.0",
+    "private": true,
     "main": "index.js",
     "description": "A collection of utilities for testing microservices integration in NestJS.",
     "author": "papooch",

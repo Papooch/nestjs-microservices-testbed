@@ -18,6 +18,7 @@ This way, you can "emit" messages to the test bed and your application would han
 ```ts
 // ...other imports
 import { TestBedClient } from '@nestjs-microservices-testbed/core';
+import waitForExpect from 'wait-for-expect';
 
 class ExclamationInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler<any> ): Observable<any> {
@@ -47,6 +48,11 @@ class TestAppConsumer {
     @MessagePattern('handle-response')
     handleResponse() {
         return 'Response!';
+    }
+
+    @EventPattern('events')
+    handleEvent(@Payload() data: string) {
+        this.client.emit('emitted-events', data).subscribe();
     }
 }
 
@@ -93,6 +99,21 @@ describe('Microservices Testbed', () => {
         const result = await app.get(TestAppConsumer).returnResponse();
         // observe that a response was received through the client
         expect(result).toBe('Response!');
+    });
+
+    it('should handle event pattern', async () => {
+        // emit an event using the test bed
+        testBed.handleEvent({
+            pattern: 'events',
+            data: 'event-payload',
+        });
+        await waitForExpect(() => {
+            // verify that your application handled the event
+            // by checking that it emitted another event
+            expect(
+                testBed.getLastMessageForPattern('emitted-events').data
+            ).toEqual(['event-payload']);
+        });
     });
 });
 ```
