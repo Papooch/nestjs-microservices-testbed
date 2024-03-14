@@ -1,0 +1,40 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  cancel-in-progress: true
+  group: publish-${{ github.ref }}
+
+jobs:
+  publish_to_npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - name: Configure git
+        run: |
+          git config --local user.name 'github-action[bot]'
+          git config --local user.email 'github-action[bot]@github.com'
+
+      - run: yarn
+      - run: yarn build
+      - run: yarn test
+      - run: yarn monodeploy
+        env:
+          # needed to publish to npm
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # needed to create a release
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
